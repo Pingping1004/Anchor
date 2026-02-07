@@ -207,7 +207,7 @@ struct TaskCardView: View {
             HabitSheetView(
                 taskTitle: task.title,
                 currentHabit: task.habit ?? .morningCoffee,
-                currentTime: task.habitTime ?? Date(),
+                currentTime: task.habitTime,
                 onDone: { selectedHabit, selectedTime in
                     if let habit = selectedHabit, let time = selectedTime {
                         task.updateTask(habit: habit, habitTime: time, context: modelContext)

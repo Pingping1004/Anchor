@@ -123,7 +123,7 @@ struct CreateGoal: View {
                 HabitSheetView(
                     taskTitle: task.title.isEmpty ? "Task" : task.title,
                     currentHabit: task.habit ?? .morningCoffee,
-                    currentTime: task.habitTime ?? Date(),
+                    currentTime: task.habitTime,
                     onDone: { newHabit, newTime in
                         if let habit =  newHabit, let time = newTime {
                             vm.updateHabit(type: habit, time: time)

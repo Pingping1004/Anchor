@@ -206,7 +206,7 @@ struct TaskCreationSheet: View {
             HabitSheetView(
                 taskTitle: title.isEmpty ? "Your Task" : title,
                 currentHabit: habit ?? .morningCoffee,
-                currentTime: habitTime ?? Date(),
+                currentTime: habitTime,
                 onDone: { selectedHabit, selectedTime in
                     self.habit = selectedHabit
                     self.habitTime = selectedTime

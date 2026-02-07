@@ -19,8 +19,16 @@ struct HabitSheetView: View {
         self.currentTime = currentTime
         self.onDone = onDone
         
-        _habitType = State(initialValue: currentHabit ?? .morningCoffee)
-        _habitTime = State(initialValue: currentTime ?? Date())
+        let initialHabit = currentHabit ?? .morningCoffee
+        _habitType = State(initialValue: initialHabit)
+        
+        if let time = currentTime {
+            _habitTime = State(initialValue: time)
+        } else {
+            let defaultHour = initialHabit.defaultTimeWindow
+            let defaultDate = Calendar.current.date(bySettingHour: defaultHour, minute: 0, second: 0, of: Date()) ?? Date()
+            _habitTime = State(initialValue: defaultDate)
+        }
     }
     
     var body: some View {
@@ -53,7 +61,9 @@ struct HabitSheetView: View {
             .onChange(of: habitType) { _, newHabit in
                 if hasLoadedInitialState { applyDefaultTime(for: newHabit) }
             }
-            .onAppear { hasLoadedInitialState = true }
+            .onAppear {
+                hasLoadedInitialState = true
+            }
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Done") {
@@ -75,13 +85,4 @@ struct HabitSheetView: View {
             withAnimation { self.habitTime = newDate }
         }
     }
-}
-
-#Preview {
-    HabitSheetView(
-        taskTitle: "Mockup Task Title",
-        currentHabit: .finishMeal,
-        currentTime: Date(),
-        onDone: { habit, time in }
-    )
 }
