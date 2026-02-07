@@ -36,7 +36,7 @@ extension Task {
         
         return Calendar.current.compare(myDeadline, to: parentLimit, toGranularity: .day) == .orderedDescending
     }
-
+    
     var canBeCompleted: Bool {
         if subtasks.isEmpty { return true }
         if areAllDescendantsCompleted { return true }
@@ -148,40 +148,47 @@ extension Task {
             return completeTask()
         }
         
-        // Check if next exceeds hard deadline
-        if let hardDeadline = self.deadline {
-            let nextDay = calendar.startOfDay(for: nextDeadline)
-            let limitDay = calendar.startOfDay(for: hardDeadline)
-            
-            if nextDay >= limitDay {
-                self.currentDeadline = hardDeadline
-                self.restartCycleState()
-                
-                handleChildCascade(newParentDeadline: hardDeadline, strict: false)
-                
-                parent?.childDidChange()
-                checkGoalCompletion()
-                return true
+        var effectiveLimit: Date?
+        
+        if let myDeadline = self.deadline {
+            effectiveLimit = myDeadline
+        }
+        
+        if let parentLimit = self.parent?.currentDeadline ?? self.parent?.deadline {
+            if let current = effectiveLimit {
+                if parentLimit < current { effectiveLimit = parentLimit }
+            } else {
+                effectiveLimit = parentLimit
             }
         }
         
-        if let parent = parent,
-           let parentCurrentDeadline = parent.currentDeadline ?? goal?.currentDeadline {
-            let nextDay = calendar.startOfDay(for: nextDeadline)
-            let parentDay = calendar.startOfDay(for: parentCurrentDeadline)
-            
-            if nextDay >= parentDay {
-                self.completeCycleState()
-                checkGoalCompletion()
-                return true
+        if let goalLimit = self.goal?.deadline {
+            if let current = effectiveLimit {
+                if goalLimit < current { effectiveLimit = goalLimit }
+            } else {
+                effectiveLimit = goalLimit
             }
         }
         
-        // Check parent's hard deadline (if exists)
-        if let parent = parent,
-           let parentHardDeadline = parent.deadline {
-            if nextDeadline > parentHardDeadline {
-                return completeTask()
+        if let limit = effectiveLimit {
+            let nextDay = calendar.startOfDay(for: nextDeadline)
+            let limitDay = calendar.startOfDay(for: limit)
+            
+            if nextDay > limitDay {
+                let currentDay = calendar.startOfDay(for: baseDate)
+                if currentDay < limitDay {
+                    self.currentDeadline = limit
+                    self.restartCycleState()
+                    
+                    handleChildCascade(newParentDeadline: limit, strict: false)
+                    parent?.childDidChange()
+                    checkGoalCompletion()
+                    return true
+                }
+                
+                else {
+                    return completeTask()
+                }
             }
         }
         
