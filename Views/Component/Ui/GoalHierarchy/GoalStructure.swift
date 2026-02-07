@@ -82,6 +82,7 @@ struct GoalStructure: View {
                     }
                     
                     tasksList
+                        .padding(.top, 24)
                 }
             }
         }

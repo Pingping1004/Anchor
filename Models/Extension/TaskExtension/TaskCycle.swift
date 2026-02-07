@@ -72,7 +72,8 @@ extension Task {
     var canShiftToNextDeadline: Bool {
         if repeatFrequency == .never { return false }
         
-        guard let hardLimit = self.deadline ?? self.parent?.deadline else { return true }
+        let hardLimit = self.deadline ?? self.parent?.deadline ?? self.goal?.deadline
+        guard let hardLimit else { return true }
         
         let base = self.currentDeadline ?? self.createdAt
         let isAtLimit = Calendar.current.isDate(base, inSameDayAs: hardLimit)
@@ -96,6 +97,7 @@ extension Task {
         self.status = .completedOnTime(completedAt: Date())
     }
     
+    @MainActor
     @discardableResult
     func toggleTask(context: ModelContext? = nil) -> Bool {
         switch status {
@@ -187,23 +189,19 @@ extension Task {
         self.restartCycleState()
         
         handleChildCascade(newParentDeadline: nextDeadline, strict: true)
-        
         parent?.childDidChange()
         checkGoalCompletion()
         
         return true
     }
     
-    private func handleChildCascade(newParentDeadline: Date, strict: Bool) {
+    func handleChildCascade(newParentDeadline: Date, strict: Bool) {
         let calendar = Calendar.current
         let newDeadlineDay = calendar.startOfDay(for: newParentDeadline)
         
         for child in subtasks {
             guard child.isCompleted else { continue }
-            
-            if child.repeatFrequency == .never {
-                continue
-            }
+            if child.repeatFrequency == .never { continue }
             
             let childBase = child.currentDeadline ?? child.deadline ?? Date()
             guard let childNext = calculatedNextDeadline(from: childBase, frequency: child.repeatFrequency) else { continue }
@@ -270,10 +268,8 @@ extension Task {
         
         for subtask in self.subtasks {
             if subtask.isCompleted && subtask.repeatFrequency != .never {
-                
                 let base = subtask.currentDeadline ?? subtask.createdAt
                 if let next = calculatedNextDeadline(from: base, frequency: subtask.repeatFrequency) {
-                    
                     let nextDay = calendar.startOfDay(for: next)
                     let limitDay = calendar.startOfDay(for: parentLimit)
                     

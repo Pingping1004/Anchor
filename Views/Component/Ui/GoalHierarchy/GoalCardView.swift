@@ -152,18 +152,10 @@ struct GoalCardView: View {
     private var liveDateBinding: Binding<Date?> {
         Binding(
             get: {
-                if let existingDeadline = goal.deadline {
-                    return existingDeadline
-                }
-                
-                if let inheritedDeadline = goal.neareseParentDeadline {
-                    return inheritedDeadline
-                }
-                
-                return Date()
+                return goal.deadline
             },
             set: { newDate in
-                goal.updateGoal(deadline: newDate, context: context)
+                goal.deadline = newDate
                 try? context.save()
             }
         )
@@ -191,7 +183,7 @@ struct GoalCardView: View {
                         }
                     }
             }
-            .presentationDetents([.medium, .large])
+            .presentationDetents([.large])
         }
     }
 }

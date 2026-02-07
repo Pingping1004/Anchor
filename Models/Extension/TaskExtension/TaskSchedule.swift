@@ -65,7 +65,7 @@ extension Task {
     }
     
     private func clampToHierarchy(_ date: Date) -> Date {
-        if let parentDeadline = self.parent?.currentDeadline {
+        if let parentDeadline = self.parent?.deadline {
             if date > parentDeadline {
                 return parentDeadline
             }

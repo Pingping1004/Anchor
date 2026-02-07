@@ -229,7 +229,7 @@ struct TaskCardView: View {
                     isFinishing = true
                 }
                 withAnimation(.bouncy(duration: 0.4, extraBounce: 0.1)) {
-                    _ = task.toggleTask()
+                    _ = task.toggleTask(context: modelContext)
                     isFinishing = false
                     UINotificationFeedbackGenerator().notificationOccurred(.success)
                 }
@@ -255,7 +255,7 @@ struct TaskCardView: View {
             return
         } else {
             withAnimation {
-                _ = task.toggleTask()
+                _ = task.toggleTask(context: modelContext)
             }
             try? modelContext.save()
         }

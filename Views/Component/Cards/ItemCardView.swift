@@ -55,7 +55,8 @@ struct CardView<T: CycleManagable & Observable>: View {
             .tint(.blue)
             .lineLimit(nil)
             .textFieldStyle(.plain)
-            .padding(12)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 20)
             .onAppear {
                 editingTitle = item.title
             }
@@ -65,7 +66,7 @@ struct CardView<T: CycleManagable & Observable>: View {
         VStack(alignment: .leading, spacing: 4) {
             statusHeader
             
-            if item.repeatFrequency != .never || item.deadline != nil {
+            if (item.repeatFrequency != .never || item.deadline != nil) && item.habit?.iconLabel == nil {
                 metadataFooter
             } else {
                 Color.clear.frame(height: 16)

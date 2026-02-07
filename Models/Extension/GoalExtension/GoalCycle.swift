@@ -1,10 +1,18 @@
 import Foundation
 
 extension Goal {
+    var effectiveDeadline: Date? {
+        if let parentDeadline = self.deadline {
+            return parentDeadline
+        }
+        
+        return parent?.effectiveDeadline
+    }
+    
     var canShiftToNextDeadline: Bool {
         if repeatFrequency == .never { return false }
         
-        guard let hardLimit = self.deadline ?? self.parent?.deadline else { return true }
+        guard let hardLimit = self.effectiveDeadline else { return true }
         
         let base = self.currentDeadline ?? self.startDate
         let isAtLimit = Calendar.current.isDate(base, inSameDayAs: hardLimit)
