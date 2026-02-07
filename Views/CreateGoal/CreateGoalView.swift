@@ -125,7 +125,7 @@ struct CreateGoal: View {
                     currentHabit: task.habit ?? .morningCoffee,
                     currentTime: task.habitTime ?? Date(),
                     onDone: { newHabit, newTime in
-                        if let habit = newHabit, let time = newTime {
+                        if let habit =  newHabit, let time = newTime {
                             vm.updateHabit(type: habit, time: time)
                         } else {
                             vm.deleteHabit()
