@@ -47,6 +47,8 @@ extension Task {
             habit: self.habit,
             currentDeadline: baseDate
         )
+        virtualGoal.isVirtualGoal = true
+        virtualGoal.sourceTaskId = self.id
         virtualGoal.isCompleted = self.isCompleted
         return virtualGoal
     }

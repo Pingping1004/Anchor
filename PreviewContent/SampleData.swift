@@ -128,7 +128,7 @@ struct PreviewContent {
         let pastDate = Calendar.current.date(byAdding: .day, value: -3, to: Date())!
         let task3b = Task(
             title: "Export Icons & Assets ",
-            status: .completedOnTime(completedAt: pastDate),
+            status: .inProgress,
             difficultyLevel: .Easy,
             repeatFrequency: .never,
             taskTier: 3,

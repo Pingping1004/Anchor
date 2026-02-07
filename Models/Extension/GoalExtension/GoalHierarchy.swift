@@ -30,4 +30,12 @@ extension Goal {
     var rootTasks: [Task] {
         return self.tasks
     }
+    
+    var neareseParentDeadline: Date? {
+        if let parentDeadline = parent?.deadline {
+            return parentDeadline
+        }
+        
+        return parent?.neareseParentDeadline
+    }
 }

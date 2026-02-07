@@ -159,7 +159,7 @@ struct GoalDetail: View {
         Group {
             if isEditing {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Why This Matters?")
+                    Text("Why This Matters To You?")
                         .font(.title3.bold())
                     
                     TextEditorField(text: $viewModel.goal.whyMatter, externalFocus: $isFocused, label: "Goal Important")
@@ -167,7 +167,7 @@ struct GoalDetail: View {
                 }
             } else {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Why This Matters?")
+                    Text("Why This Matters To You?")
                         .font(.title3.bold())
                         .foregroundStyle(.primary)
                     

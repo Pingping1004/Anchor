@@ -101,10 +101,12 @@ struct GoalCardView: View {
             }
         }
         
-        Button {
-            viewModel.activeSheet = .categoryPicker
-        } label: {
-            Label("Edit Category", systemImage: "tag")
+        if !goal.isVirtualGoal {
+            Button {
+                viewModel.activeSheet = .categoryPicker
+            } label: {
+                Label("Edit Category", systemImage: "tag")
+            }
         }
     }
     
@@ -149,7 +151,17 @@ struct GoalCardView: View {
     
     private var liveDateBinding: Binding<Date?> {
         Binding(
-            get: { goal.currentDeadline },
+            get: {
+                if let existingDeadline = goal.deadline {
+                    return existingDeadline
+                }
+                
+                if let inheritedDeadline = goal.neareseParentDeadline {
+                    return inheritedDeadline
+                }
+                
+                return Date()
+            },
             set: { newDate in
                 goal.updateGoal(deadline: newDate, context: context)
                 try? context.save()

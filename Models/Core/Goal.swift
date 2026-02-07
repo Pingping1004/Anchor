@@ -4,6 +4,9 @@ import SwiftData
 @Model
 final class Goal: CompletableItem, CycleManagable {
     @Attribute(.unique) var id: UUID
+    @Attribute(.ephemeral) var isVirtualGoal: Bool = false
+    @Attribute(.ephemeral) var sourceTaskId: UUID? = nil
+    
     var title: String
     var category: Set<GoalCategory>
     var whyMatter: String
