@@ -3,7 +3,7 @@ import SwiftData
 
 struct ContentView: View {
     @Environment(\.modelContext) private var context
-    @Query(sort: \Goal.startDate) var allGoals: [Goal]
+    @Query(sort: \Goal.deadline, order: .forward) var allGoals: [Goal]
     
     @StateObject private var viewModel = HomeViewModel()
     
