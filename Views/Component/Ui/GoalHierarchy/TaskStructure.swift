@@ -41,8 +41,9 @@ struct TaskStructure: View {
         let childTier = task.activeSubtasks.first?.taskTier ?? (task.taskTier + 1)
         let parentTierCount: Int = taskCounts[task.taskTier] ?? 1
         let childTierCount = taskCounts[childTier] ?? 0
+        let taskInRowLimit = isAccessibilityMode ? 2 : 3
         
-        return children.count > 1 && (childTierCount >= 3 && parentTierCount > 1)
+        return children.count > 1 && (childTierCount >= taskInRowLimit && parentTierCount > 1)
     }
     
     private var isAccessibilityMode: Bool {
@@ -155,7 +156,7 @@ struct TaskStructure: View {
                 .multilineTextAlignment(.center)
                 .foregroundStyle(LinearGradient.primaryGradient)
                 .aspectRatio(1.0, contentMode: .fit)
-                .frame(width: 72, height: 72)
+                .frame(width: 72 + dynamicSpacing, height: 72 + dynamicSpacing)
                 .padding()
                 .glassEffect(
                     .regular.interactive(),
