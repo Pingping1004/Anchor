@@ -117,7 +117,6 @@ struct SubtaskCard: View {
             task.toggleTask()
         }
         
-        // Haptic Feedback
         if !task.isCompleted {
             UINotificationFeedbackGenerator().notificationOccurred(.success)
         } else {

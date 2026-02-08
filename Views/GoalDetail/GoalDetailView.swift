@@ -218,13 +218,3 @@ struct GoalDetail: View {
     }
 }
 
-#Preview {
-    @Previewable @State var previewGoal = PreviewContent.sampleGoal
-    
-    NavigationStack {
-        GoalDetail(goal: previewGoal)
-    }
-//    .preferredColorScheme(.dark)
-    .environment(\.dynamicTypeSize, .xxxLarge)
-    .modelContainer(PreviewContent.container)
-}

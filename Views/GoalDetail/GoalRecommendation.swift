@@ -105,11 +105,3 @@ struct RecommendationCard: View {
         )
     }
 }
-
-#Preview {
-    @Previewable var sampleGoal: Goal = PreviewContent.sampleGoal
-    
-    GoalRecommendationView(goal: sampleGoal)
-        .padding()
-        .modelContainer(PreviewContent.container)
-}

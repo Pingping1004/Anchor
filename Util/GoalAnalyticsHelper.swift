@@ -183,7 +183,7 @@ struct GoalAnalyticsHelper {
         
         let weekends = completed.filter {
             let weekday = calendar.component(.weekday, from: $0.completedAt ?? Date())
-            return weekday == 1 || weekday == 7 // Sun, Sat
+            return weekday == 1 || weekday == 7
         }
         return Double(weekends.count) / Double(completed.count) > 0.65
     }

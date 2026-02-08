@@ -5,7 +5,6 @@ extension Goal {
         return tasks as [any CycleManagable]
     }
     
-    // Returns the top-level tasks, filtering out old history versions of recurring tasks
     var activeRootTasks: [Task] {
         let roots = tasks.filter { $0.parent == nil }
         

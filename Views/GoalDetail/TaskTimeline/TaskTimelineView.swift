@@ -177,10 +177,3 @@ struct TimelineItemContainer: View {
         return task.isCompleted ? activeColor : inactiveColor
     }
 }
-
-#Preview {
-    let previewGoal: Goal = PreviewContent.sampleGoal
-    
-    GoalTaskTimelineView(tasks: previewGoal.tasks)
-//        .environment(\.dynamicTypeSize, .accessibility5)
-}

@@ -181,10 +181,3 @@ struct ContentView: View {
         )
     }
 }
-
-#Preview {
-    ContentView()
-//        .preferredColorScheme(.dark)
-        .environment(\.dynamicTypeSize, .xxxLarge)
-        .modelContainer(PreviewContent.container)
-}

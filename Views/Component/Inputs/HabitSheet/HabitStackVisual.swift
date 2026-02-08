@@ -95,9 +95,3 @@ struct HabitStackVisualView: View {
         .accessibilityHint("Shows how linking \(selectedHabit?.cleanTitle ?? "a habit") to \(taskTitle) improves success.")
     }
 }
-
-#Preview {
-    HabitStackVisualView(taskTitle: "Upload Tiktok content", selectedHabit: .finishMeal)
-//            .preferredColorScheme(.dark)
-        .padding()
-}

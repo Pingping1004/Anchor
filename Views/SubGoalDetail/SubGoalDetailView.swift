@@ -166,28 +166,3 @@ struct SubGoalDetail: View {
         }
     }
 }
-
-#Preview {
-    @Previewable @Environment(\.modelContext) var context
-    let container = PreviewContent.container
-    
-    let previewGoal = PreviewContent.sampleGoal
-    let demoTask = previewGoal.tasks.first ?? Task(title: "Preview Task", status: .inProgress, difficultyLevel: .Medium, taskTier: 1)
-    
-    let _ = {
-        if !previewGoal.tasks.contains(demoTask) {
-            previewGoal.tasks.append(demoTask)
-        }
-        container.mainContext.insert(previewGoal)
-    }()
-    
-    NavigationStack {
-        SubGoalDetail(
-            task: demoTask,
-            goalId: previewGoal.id,
-            context: context
-        )
-    }
-    .environment(\.dynamicTypeSize, .xxxLarge)
-    .modelContainer(container)
-}

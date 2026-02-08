@@ -136,9 +136,3 @@ struct CreateGoal: View {
         }
     }
 }
-
-#Preview {
-    CreateGoal()
-            .preferredColorScheme(.dark)
-        .environment(\.dynamicTypeSize, .xxxLarge)
-}

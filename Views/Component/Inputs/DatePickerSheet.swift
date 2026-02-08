@@ -134,16 +134,3 @@ struct DatePickerSheet: View {
         .tint(LinearGradient.primaryGradient)
     }
 }
-
-#Preview {
-    @Previewable @State var selectedDate: Date? = Date()
-    let previewGoal = PreviewContent.sampleGoal
-    
-    DatePickerSheet(
-        selectedDate: .constant(selectedDate),
-        label: "Start Date",
-        displayedComponents: [.date],
-        isPastDateAllowed: true,
-        maximumDate: previewGoal.deadline
-    )
-}

@@ -46,9 +46,3 @@ struct CategorySelection: View {
         }
     }
 }
-
-#Preview {
-    @Previewable @State var selectedCategories: Set<GoalCategory> = []
-    
-    CategorySelection(selectedCategories: $selectedCategories)
-}

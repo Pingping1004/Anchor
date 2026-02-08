@@ -68,19 +68,11 @@ class GoalDetailViewModel {
         try? context.save()
     }
     
-//    func prepareForEditing() {
-//        newWhyMatter = goal.whyMatter
-//    }
-    
     func saveChanges(context: ModelContext) {
         if goal.isDeleted {
             showingMissingGoalAlert = true
             return
         }
-        
-//        if goal.whyMatter != newWhyMatter {
-//            goal.whyMatter = newWhyMatter
-//        }
         
         try? context.save()
     }

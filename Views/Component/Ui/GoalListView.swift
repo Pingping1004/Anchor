@@ -112,11 +112,3 @@ struct GoalListView: View {
         }
     }
 }
-
-#Preview {
-    let previewGoal: Goal = PreviewContent.sampleGoal
-
-    GoalListView(goal: previewGoal)
-        .padding()
-        .modelContainer(PreviewContent.container)
-}

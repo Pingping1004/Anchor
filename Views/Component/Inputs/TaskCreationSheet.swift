@@ -215,16 +215,3 @@ struct TaskCreationSheet: View {
         }
     }
 }
-
-#Preview {
-    let newTitle: String = "New title example"
-    let taskDifficulty: TaskDifficultyLevel = .Medium
-    let repeatFrequency: RepeatFrequency = .never
-    let taskDeadline: Date? = Calendar.current.date(byAdding: .day, value: 1, to: Date())
-    let habit: HabitType? = .arriveHome
-    let habitTime: Date? = Date()
-    
-    TaskCreationSheet { title, difficulty, frequency, deadline, selectedHabit, selectedHabitTime in
-        _ = (newTitle, taskDifficulty, repeatFrequency, taskDeadline, habit, habitTime, title, difficulty, frequency, deadline, selectedHabit as Any, selectedHabitTime as Any)
-    }
-}

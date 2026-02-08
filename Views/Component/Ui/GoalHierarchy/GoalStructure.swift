@@ -159,16 +159,3 @@ struct GoalStructure: View {
         .padding(.vertical, 24)
     }
 }
-
-#Preview {
-    @Previewable @State var previewGoal: Goal = PreviewContent.sampleGoal
-    let isEditing: Bool = false
-    
-    NavigationStack {
-        GoalStructure(goal: previewGoal, onRefresh: {}, onLockToast: {},isEditing: isEditing)
-            .padding()
-    }
-    .preferredColorScheme(.dark)
-//    .environment(\.dynamicTypeSize, .accessibility5)
-    .modelContainer(PreviewContent.container)
-}
