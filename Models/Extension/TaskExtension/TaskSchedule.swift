@@ -43,7 +43,12 @@ extension Task {
         let checkpointDate = calculatePreviousDate(from: baseDate, frequency: oldFreq)
         let newDeadline = calculatedNextDeadline(from: checkpointDate, frequency: newFrequency) ?? hardDeadline
         
-        self.currentDeadline = clampToHierarchy(newDeadline)
+        if newDeadline < Date() {
+            self.currentDeadline = Date()
+        } else {
+            self.currentDeadline = clampToHierarchy(newDeadline)
+        }
+        
         return true
     }
     
