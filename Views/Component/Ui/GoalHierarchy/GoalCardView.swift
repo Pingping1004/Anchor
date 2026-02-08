@@ -60,10 +60,14 @@ struct GoalCardView: View {
             performToggle()
         }
         .accessibilityAction(named: "Change Deadline") {
-            viewModel.activeSheet = .datePicker
+            if !goal.isVirtualGoal {
+                viewModel.activeSheet = .datePicker
+            }
         }
         .accessibilityAction(named: "Edit Category") {
-            viewModel.activeSheet = .categoryPicker
+            if !goal.isVirtualGoal {
+                viewModel.activeSheet = .categoryPicker
+            }
         }
         .accessibilityValue(accessibilityStatusString)
         .containerRelativeFrame(.horizontal) { length, _ in
@@ -89,10 +93,12 @@ struct GoalCardView: View {
     
     @ViewBuilder
     private func contextMenuContent(taskCount: Int) -> some View {
-        Button {
-            viewModel.activeSheet = .datePicker
-        } label: {
-            Label(liveDateBinding.wrappedValue == nil ? "Set Deadline" : "Edit Deadline", systemImage: "calendar")
+        if !goal.isVirtualGoal {
+            Button {
+                viewModel.activeSheet = .datePicker
+            } label: {
+                Label(liveDateBinding.wrappedValue == nil ? "Set Deadline" : "Edit Deadline", systemImage: "calendar")
+            }
         }
         
         if taskCount < maxTasksPerRow {

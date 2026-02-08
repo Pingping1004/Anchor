@@ -19,33 +19,125 @@ struct TaskCardView: View {
     
     @State var activeSheet: TaskCardSheetType?
     @State private var isProcessingRepeat = false
+    @State private var showLimitAlert = false
     @State private var isFinishing = false
     @State private var shakeTrigger: Int = 0
     
-    let maxTasksPerRow: Int = 3
-    
-    private var latestDirectChildDeadline: Date? {
-        let childDeadlines = task.subtasks.compactMap { $0.deadline }
-        return childDeadlines.max()
-    }
-    
-    private var isAccessibilityMode: Bool {
-        typeSize.isAccessibilityCategory
-    }
-    
-    private var frequencyBinding: Binding<RepeatFrequency> {
-        Binding(
-            get: { task.repeatFrequency },
-            set: { newFrequency in
-                task.updateTask(frequency: newFrequency, context: modelContext)
-            }
-        )
-    }
+    private let animationDuration: Double = 0.5
     
     var body: some View {
         let isAddable: Bool = task.taskTier < 5 && task.activeSubtasks.count < 3
         let canInteract = task.canBeCompleted
         
+        baseCardContent(canInteract: canInteract)
+            .onTapGesture {
+                handleTap(canInteract: canInteract)
+            }
+            .contextMenu {
+                contextMenuContent(isAddable: isAddable)
+            }
+            .sheet(item: $activeSheet) { type in
+                sheetContent(for: type)
+            }
+            .alert("Goal Deadline Exceeded", isPresented: $showLimitAlert) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                limitAlertMessage
+            }
+    }
+}
+
+extension TaskCardView {
+    private func handleTap(canInteract: Bool) {
+        if !canInteract && !isEditing {
+            withAnimation(.default) {
+                shakeTrigger += 1
+            }
+            onLockedToast()
+            return
+        }
+        
+        if !isEditing && canInteract {
+            performToggle()
+        }
+        
+        if task.isCompleted && !isEditing && !task.canShiftToNextDeadline {
+            HapticSoundManager.shared.play(.tock)
+        }
+    }
+    
+    private func performToggle() {
+        let generator = UIImpactFeedbackGenerator(style: .medium)
+        generator.impactOccurred()
+        
+        if task.isCompleted || task.repeatFrequency == .never {
+            toggleSimpleTask()
+            return
+        }
+        
+        toggleRepeatingTask()
+    }
+    
+    private func toggleSimpleTask() {
+        if !task.isCompleted {
+            withAnimation(.snappy) {
+                isFinishing = true
+            }
+            
+            withAnimation(.bouncy(duration: 0.4, extraBounce: 0.1)) {
+                _ = task.toggleTask(context: modelContext)
+                isFinishing = false
+                UINotificationFeedbackGenerator().notificationOccurred(.success)
+            }
+        } else {
+            withAnimation {
+                _ = task.toggleTask(context: modelContext)
+            }
+        }
+        
+        try? modelContext.save()
+    }
+    
+    private func toggleRepeatingTask() {
+        withAnimation(.snappy) {
+            isFinishing = true
+            isProcessingRepeat = true
+            task.completeCycleState()
+        }
+        UINotificationFeedbackGenerator().notificationOccurred(.success)
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + animationDuration) {
+            processRepeatLogic()
+        }
+    }
+    
+    private func processRepeatLogic() {
+        let goalLimit = task.goal?.deadline
+        
+        withAnimation(.smooth) {
+            _ = task.advanceTaskCycle()
+            isFinishing = false
+            isProcessingRepeat = false
+        }
+        
+        if let newDate = task.currentDeadline,
+           let limit = goalLimit {
+            
+            let comparison = Calendar.current.compare(newDate, to: limit, toGranularity: .day)
+            
+            if comparison == .orderedSame || comparison == .orderedDescending {
+                showLimitAlert = true
+            }
+        }
+        
+        try? modelContext.save()
+    }
+}
+
+extension TaskCardView {
+    
+    @ViewBuilder
+    private func baseCardContent(canInteract: Bool) -> some View {
         CardView(
             item: task,
             isEditing: isEditing,
@@ -78,30 +170,7 @@ struct TaskCardView: View {
             .regular,
             in: .rect(cornerRadius: 16, style: .continuous)
         )
-        .onTapGesture {
-            if !canInteract && !isEditing {
-                withAnimation(.default) {
-                    shakeTrigger += 1
-                }
-                
-                onLockedToast()
-            }
-            
-            if !isEditing && canInteract {
-                performToggle()
-            }
-            
-            if task.isCompleted && !isEditing && !task.canShiftToNextDeadline {
-                HapticSoundManager.shared.play(.tock)
-            }
-        }
-        .contextMenu {
-            contextMenuContent(isAddable: isAddable)
-        }
         .animation(.easeInOut(duration: 0.4), value: canInteract)
-        .sheet(item: $activeSheet) { type in
-            sheetContent(for: type)
-        }
     }
     
     @ViewBuilder
@@ -111,7 +180,7 @@ struct TaskCardView: View {
         } label: {
             Label(task.deadline == nil ? "Set Deadline" : "Edit Deadline", systemImage: "calendar")
         }
- 
+
         if isAddable {
             Button(action: onAddSubtask) {
                 Label("Add Subtask", systemImage: "arrow.turn.down.right")
@@ -162,21 +231,6 @@ struct TaskCardView: View {
         }
     }
     
-    private var accessibilityStatusString: String {
-        var status = task.isCompleted ? "Completed" : "Incomplete"
-        
-        if let deadline = task.deadline {
-            if deadline < Date.now && !task.isCompleted {
-                status += ", Overdue due \(deadline.formatted(date: .abbreviated, time: .omitted))"
-            } else {
-                status += ", due \(deadline.formatted(date: .abbreviated, time: .omitted))"
-            }
-        }
-        
-        status += ", \(task.difficultyLevel.rawValue) difficulty"
-        return status
-    }
-    
     @ViewBuilder
     private func sheetContent(for type: TaskCardSheetType) -> some View {
         switch type {
@@ -218,46 +272,47 @@ struct TaskCardView: View {
             )
         }
     }
+}
+
+extension TaskCardView {
     
-    private func performToggle() {
-        let generator = UIImpactFeedbackGenerator(style: .medium)
-        generator.impactOccurred()
+    private var isAccessibilityMode: Bool {
+        typeSize.isAccessibilityCategory
+    }
+    
+    private var limitAlertMessage: Text {
+        let taskDate = task.currentDeadline?.formatted(date: .abbreviated, time: .omitted) ?? "the next date"
+        let goalDate = task.goal?.deadline?.formatted(date: .abbreviated, time: .omitted) ?? "the goal deadline"
         
-        if !task.isCompleted {
-            if task.repeatFrequency == .never {
-                withAnimation(.snappy) {
-                    isFinishing = true
-                }
-                withAnimation(.bouncy(duration: 0.4, extraBounce: 0.1)) {
-                    _ = task.toggleTask(context: modelContext)
-                    isFinishing = false
-                    UINotificationFeedbackGenerator().notificationOccurred(.success)
-                }
-                try? modelContext.save()
-                return
+        return Text("The next scheduled date (\(taskDate)) is past your Goal's deadline (\(goalDate)). You may want to manually adjust the deadline to stay on track.")
+    }
+    
+    private var latestDirectChildDeadline: Date? {
+        let childDeadlines = task.subtasks.compactMap { $0.deadline }
+        return childDeadlines.max()
+    }
+    
+    private var frequencyBinding: Binding<RepeatFrequency> {
+        Binding(
+            get: { task.repeatFrequency },
+            set: { newFrequency in
+                task.updateTask(frequency: newFrequency, context: modelContext)
             }
-            
-            withAnimation(.snappy) {
-                isFinishing = true
-                isProcessingRepeat = true
-                task.completeCycleState()
+        )
+    }
+    
+    private var accessibilityStatusString: String {
+        var status = task.isCompleted ? "Completed" : "Incomplete"
+        
+        if let deadline = task.deadline {
+            if deadline < Date.now && !task.isCompleted {
+                status += ", Overdue due \(deadline.formatted(date: .abbreviated, time: .omitted))"
+            } else {
+                status += ", due \(deadline.formatted(date: .abbreviated, time: .omitted))"
             }
-            UINotificationFeedbackGenerator().notificationOccurred(.success)
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                withAnimation(.smooth) {
-                    _ = task.advanceTaskCycle()
-                    isFinishing = false
-                    isProcessingRepeat = false
-                }
-                try? modelContext.save()
-            }
-            return
-        } else {
-            withAnimation {
-                _ = task.toggleTask(context: modelContext)
-            }
-            try? modelContext.save()
         }
+        
+        status += ", \(task.difficultyLevel.rawValue) difficulty"
+        return status
     }
 }
