@@ -156,7 +156,7 @@ struct TaskStructure: View {
                 .multilineTextAlignment(.center)
                 .foregroundStyle(LinearGradient.primaryGradient)
                 .aspectRatio(1.0, contentMode: .fit)
-                .frame(width: 72 + dynamicSpacing, height: 72 + dynamicSpacing)
+                .frame(minWidth: 72 + dynamicSpacing, minHeight: 72 + dynamicSpacing)
                 .padding()
                 .glassEffect(
                     .regular.interactive(),
@@ -165,8 +165,9 @@ struct TaskStructure: View {
                 .padding(.bottom, 40)
         }
         .opacity(isEditing ? 0.4 : 1)
-        .accessibilityLabel("View all \(subtaskCount) subtasks")
-        .accessibilityHint("Opens the subgoal detail view.")
+        .accessibilityLabel("View \(subtaskCount) subtasks for \(task.title)")
+        .accessibilityHint("Navigates to the detailed breakdown of this goal.")
         .accessibilityAddTraits(.isButton)
+        .accessibilityRemoveTraits(.isLink)
     }
 }

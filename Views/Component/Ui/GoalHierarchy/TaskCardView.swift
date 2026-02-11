@@ -135,7 +135,6 @@ extension TaskCardView {
 }
 
 extension TaskCardView {
-    
     @ViewBuilder
     private func baseCardContent(canInteract: Bool) -> some View {
         CardView(
@@ -144,6 +143,17 @@ extension TaskCardView {
             showFrequencyText: rowDensity <= 2 && !isAccessibilityMode && sizeClass == .regular
         )
         .errorShake(trigger: shakeTrigger)
+        .accessibilityLabel(
+            {
+                var label = task.title
+                label += ", Level \(task.taskTier)"
+                
+                if let parentTitle = task.parent?.title {
+                    label += ", inside \(parentTitle)"
+                }
+                return label
+            }()
+        )
         .animation(.smooth, value: task.currentDeadline)
         .animation(.smooth, value: isFinishing)
         .animation(.smooth, value: isProcessingRepeat)
